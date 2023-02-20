@@ -1,0 +1,56 @@
+name: CD PRODUCTION PIPELINE
+
+on:
+  workflow_run:
+    workflows: [ CI TEST ]
+    branches: [ main ]
+    types:
+      - completed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 18.x
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Buliding app...
+        run: |
+          pnpm install
+          pnpm build
+        env:
+          CI: true
+
+  deploy:
+    needs: [ install ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploying app
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /etc/app/nest-starter
+            git pull
+            export NODE_ENV=development
+            pnpm install
+            pm2 stop pm2.config.js
+            export NODE_ENV=production
+            knex migrate:latest
+            pnpm build
+            pm2 restart pm2.config.js

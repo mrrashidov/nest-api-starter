@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+  api:
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    container_name: api
+    build:
+      dockerfile: Dockerfile
+      context: .
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${PORT}:${PORT}
+    command: npm run start:dev
+    tty: true
+    stdin_open: true
+    networks:
+      - nest-api
+  postgres:
+    env_file: .env
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME:-postgres}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - nest-api
+    restart: unless-stopped
+  redis:
+    env_file: .env
+    container_name: redis
+    image: redis:latest
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_HOST_PASSWORD"
+    environment:
+      - REDIS_HOST=${REDIS_HOST:-localhost}
+      - REDIS_USER=${REDIS_USER:-default}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis}
+    ports:
+      - 6379:${REDIS_PORT:-6379}
+    networks:
+      - nest-api
+
+networks:
+  nest-api:
+    name: nest-api
+    driver: bridge
+volumes:
+  postgres:
+  api:
