@@ -1,26 +1,5 @@
 version: '3.7'
 services:
-  api:
-    env_file:
-      - .env
-    depends_on:
-      - postgres
-      - redis
-    container_name: api
-    build:
-      dockerfile: Dockerfile
-      context: .
-    working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - ${PORT}:${PORT}
-    command: npm run start:dev
-    tty: true
-    stdin_open: true
-    networks:
-      - nest-api
   postgres:
     env_file: .env
     container_name: postgres
@@ -56,4 +35,3 @@ networks:
     driver: bridge
 volumes:
   postgres:
-  api:
