@@ -4,7 +4,7 @@ module.exports = {
       name: '@nest-starter',
       script: './dist/src/main.js',
       instances: 'max',
-      exec_mode: 'cluster',
+      exec_mode: 'fork',
       watch: true,
     },
   ],
