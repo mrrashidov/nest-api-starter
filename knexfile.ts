@@ -1,5 +1,6 @@
 import type { Knex } from 'knex';
-
+import * as dotenv from 'dotenv';
+dotenv.config();
 const { DB_NAME, DB_USER, DB_PASSWORD, DB_CLIENT, DB_PORT } = process.env;
 
 const config: { [key: string]: Knex.Config } = {
