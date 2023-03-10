@@ -25,6 +25,7 @@ export class ScopeGuard implements CanActivate {
     return matchScopes(needleScope, userScopes);
   }
 }
+
 function matchScopes(
   needleScopes: string | string[],
   userScopes: string[],
