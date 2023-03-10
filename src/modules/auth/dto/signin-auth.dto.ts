@@ -8,15 +8,12 @@ import {
 } from 'class-validator';
 
 export class SignInAuthDto {
-  @IsOptional()
   @IsEmail()
   email: string;
 
   @IsOptional()
-  username: string;
-
   @IsBoolean()
-  rememberMe: boolean;
+  rememberMe?: boolean = false;
 
   @IsNotEmpty()
   @NotContains(' ')
