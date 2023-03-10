@@ -11,6 +11,10 @@ import { PassportModule } from '@nestjs/passport';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/auth.guard';
 import { ScopeGuard } from './guards/scope.guard';
+import { BullModule } from '@nestjs/bull';
+import { BullSharedOptions } from '@/shared/options/bull-shared.options';
+import { MailProcessor } from '@/shared/processors/mail.processor';
+import { MailService } from '@/shared/services/mail.service';
 
 @Module({
   imports: [
@@ -23,6 +27,9 @@ import { ScopeGuard } from './guards/scope.guard';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ThrottlerModule.forRootAsync({
       useClass: ThrottleOptions,
+    }),
+    BullModule.forRootAsync({
+      useClass: BullSharedOptions,
     }),
     KnexModule.forRootAsync({
       useClass: KnexOptions,
@@ -44,6 +51,8 @@ import { ScopeGuard } from './guards/scope.guard';
       provide: APP_GUARD,
       useClass: ScopeGuard,
     },
+    MailProcessor,
+    MailService,
   ],
 })
 export class SharedModule {}
