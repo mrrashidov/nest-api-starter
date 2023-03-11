@@ -1,13 +1,13 @@
 import { Throttle } from '@nestjs/throttler';
 import {
-  Controller,
-  Headers,
-  Get,
-  Post,
   Body,
+  Controller,
+  Get,
+  Headers,
   Param,
-  Res,
+  Post,
   Req,
+  Res,
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
@@ -15,10 +15,10 @@ import { ForgotPasswordAuthDto } from './dto/forgot-password-auth.dto';
 import { ResetPasswordAuthDto } from './dto/reset-password-auth.dto';
 import { SignInAuthDto } from './dto/signin-auth.dto';
 import { SignUpAuthDto } from './dto/signup-auth.dto';
-import type { Response, Request } from 'express';
+import type { Request, Response } from 'express';
 import { UnlockAuthDto } from './dto/unlock-auth.dto';
-import { IsPublic } from '../../shared/decorators/is-public.decorator';
-import { User } from '../../shared/decorators/user.decorator';
+import { IsPublic } from '@/shared/decorators/is-public.decorator';
+import { User } from '@/shared/decorators/user.decorator';
 
 @Throttle(20, 60)
 @Controller()
@@ -27,25 +27,28 @@ export class AuthController {
 
   @IsPublic()
   @Post('auth/signin')
-  async signin(@Body() payload: SignInAuthDto, @Res() res: Response) {
-    const currentUser: any = await this.authService.signin(payload);
+  async signIn(@Body() payload: SignInAuthDto, @Res() res: Response) {
+    const currentUser: any = await this.authService.signIn(payload);
+
     if (payload.rememberMe) {
-      res
+      return res
         .cookie('rt', currentUser.refresh_token, {
-          path: '/api/v1/auth/refresh-token',
-          httpOnly: true,
-          secure: true,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
-        .send(currentUser.result);
+        .status(200)
+        .json({
+          user: currentUser.user,
+          access_token: currentUser.access_token,
+        });
     } else {
-      return res.send(currentUser);
+      return res.status(200).json(currentUser);
     }
   }
 
   @IsPublic()
   @Post('auth/signup')
-  signup(@Body() payload: SignUpAuthDto) {
-    return this.authService.signup(payload);
+  signUp(@Body() payload: SignUpAuthDto) {
+    return this.authService.signUp(payload);
   }
 
   @IsPublic()
@@ -91,7 +94,7 @@ export class AuthController {
   }
 
   @Post('auth/refresh-token')
-  refreshToken(@User() user: any, @Req() { cookies }: Request) {
-    return this.authService.refreshToken(user, cookies.rt);
+  refreshToken(@User() user: any, @Req() request: Request) {
+    return this.authService.refreshToken(user, request.cookies.rt);
   }
 }
