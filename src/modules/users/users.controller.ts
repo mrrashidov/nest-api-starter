@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { TwoFactorUserDto } from './dto/two-factor-user.dto';
 import { TwoFactorRecoveryUserDto } from './dto/two-factor-recovery-user.dto';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
+import { IsPublic } from '@/shared/decorators/is-public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -43,6 +44,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @IsPublic()
   @Get()
   findAll() {
     return this.usersService.findAll();
