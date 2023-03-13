@@ -10,6 +10,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('password').notNullable();
     table.string('first_name', 15).notNullable();
     table.string('last_name', 15).notNullable();
+    table.string('token').nullable();
     table.date('birthday').nullable();
     table
       .enum('status', ['active', 'passive', 'pending', 'block', 'deleted'])
