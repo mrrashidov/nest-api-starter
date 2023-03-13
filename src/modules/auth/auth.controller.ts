@@ -16,7 +16,6 @@ import { ResetPasswordAuthDto } from './dto/reset-password-auth.dto';
 import { SignInAuthDto } from './dto/signin-auth.dto';
 import { SignUpAuthDto } from './dto/signup-auth.dto';
 import type { Request, Response } from 'express';
-import { UnlockAuthDto } from './dto/unlock-auth.dto';
 import { IsPublic } from '@/shared/decorators/is-public.decorator';
 import { User } from '@/shared/decorators/user.decorator';
 
@@ -52,15 +51,15 @@ export class AuthController {
   }
 
   @IsPublic()
-  @Get('auth/verify/:type/confirm/:token')
-  verify(@Param('token') token: string, @Param('type') type: string) {
-    return this.authService.verify(type, token);
+  @Get('auth/verify/:token')
+  verify(@Param('token') token: string) {
+    return this.authService.verify(token);
   }
 
   @IsPublic()
-  @Get('auth/verify/:type/send')
-  send(@Param('token') token: string, @Param('type') type: string) {
-    return this.authService.send(type, token);
+  @Get('auth/verify/send')
+  send(@Param('token') token: string) {
+    return this.authService.send(token);
   }
 
   @IsPublic()
@@ -81,16 +80,6 @@ export class AuthController {
     @User() user: any,
   ): Promise<any> {
     return this.authService.logout(user, token);
-  }
-
-  @Get('auth/lock')
-  lock(@User() user: any) {
-    return this.authService.lock(user);
-  }
-
-  @Post('auth/unlock')
-  unlock(@User() user: any, @Body() payload: UnlockAuthDto) {
-    return this.authService.unlock(user, payload);
   }
 
   @Post('auth/refresh-token')
