@@ -10,9 +10,33 @@ export class MailProcessor {
   constructor(private readonly mailService: MailService) {}
 
   @Process('user-created')
-  handleTranscode(job: Job) {
+  handleUserCreated(job: Job) {
+    return this.runJob(job);
+  }
+
+  @Process('email-verification')
+  handleEmailVerification(job: Job) {
+    return this.runJob(job);
+  }
+
+  @Process('forgot-password')
+  handleForgotPassword(job: Job) {
+    return this.runJob(job);
+  }
+
+  @Process('reset-password')
+  handleResetPassword(job: Job) {
+    return this.runJob(job);
+  }
+
+  @Process('welcome')
+  handleWelcome(job: Job) {
+    return this.runJob(job);
+  }
+
+  protected runJob(job: any) {
     return this.mailService
-      .send({ to: job.data.email, action: job.name })
+      .send({ to: job.data.email, url: job.data.url, action: job.name })
       .then((res) =>
         this.logger.log({ action: '---', message: '--all-done--', data: res }),
       )

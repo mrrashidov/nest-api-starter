@@ -12,6 +12,6 @@ export class ResetPasswordAuthDto {
   password: string;
 
   @IsNotEmpty()
-  @Match('password_confirmation')
+  @Match('password')
   password_confirmation: string;
 }

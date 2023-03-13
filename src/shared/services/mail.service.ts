@@ -9,12 +9,21 @@ export class MailService {
   /**
    *
    * @param to - list of receivers
+   * @param url - Url line
    * @param action - Action line
    * @example
    *       to: 'bar@example.com, baz@example.com',
    *       action: 'email-verification',
    */
-  async send({ to, action }: { to: string; action: string }) {
+  async send({
+    to,
+    url,
+    action,
+  }: {
+    to: string;
+    url?: string;
+    action: string;
+  }) {
     const transporter = await createTransport({
       host: this.configService.get('MAIL_HOST') || 'smtp.kibera.uz',
       port: this.configService.get('MAIL_PORT') || 587,
@@ -24,15 +33,16 @@ export class MailService {
         pass: this.configService.get('MAIL_PASSWORD'),
       },
     });
-    return transporter.sendMail(this.templates(action, { to }));
+    return transporter.sendMail(this.templates(action, { to, url }));
   }
 
   /**
    * @param action - string
    * @param to - string
+   * @param url - string
    * @private
    */
-  private templates(action: string, { to }: { to: string }) {
+  private templates(action: string, { to, url }: { to: string; url?: string }) {
     switch (action) {
       case 'user-created':
         return {
@@ -59,7 +69,10 @@ export class MailService {
           )} <${this.configService.get('MAIL_FROM_ADDRESS')}>`,
           to,
           subject: 'Kibera account security info',
-          html: '<b>Forgot password message here</b>',
+          html:
+            '<h1>Forgot password message here</h1><a href="' +
+            url +
+            '">Reset Password</a>',
         };
       case 'reset-password':
         return {
