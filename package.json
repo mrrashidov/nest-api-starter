@@ -1,11 +1,22 @@
 {
   "name": "nest-starter",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": false,
+  "version": "0.0.2",
+  "private": true,
   "packageManager": "pnpm@7.29.0",
+  "engines": {
+    "node": ">18.10.0"
+  },
+  "homepage": "https://github.com/mrrashidov/nest-api-starter#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrrashidov/nest-api-starter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrrashidov/nest-api-starter/issues",
+    "email": "mrrashidov@hotmail.com"
+  },
   "license": "MIT",
+  "author": "Shoxrux Rashidov <mrrashidov@hotmail.com> (https://t.me/mrrashidov)",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
