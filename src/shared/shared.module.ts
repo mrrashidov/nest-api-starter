@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { KnexModule } from 'nestjs-knex';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -15,6 +15,7 @@ import { BullModule } from '@nestjs/bull';
 import { BullSharedOptions } from '@/shared/options/bull-shared.options';
 import { MailProcessor } from '@/shared/processors/mail.processor';
 import { MailService } from '@/shared/services/mail.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
