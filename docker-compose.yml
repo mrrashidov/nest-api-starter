@@ -1,4 +1,5 @@
 version: '3.7'
+name: nest-starter
 services:
   postgres:
     env_file: .env
@@ -35,7 +36,17 @@ services:
       - 6379:${REDIS_PORT:-6379}
     networks:
       - nest-api
-
+  server:
+    image: nest-api:1
+    env_file:
+      - .env
+    ports:
+      - 3000:${PORT:-3000}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - nest-api
 networks:
   nest-api:
     name: nest-api

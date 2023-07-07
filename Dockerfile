@@ -1,42 +1,27 @@
 FROM node:lts-alpine AS base
-LABEL authors="mrrashidov"
-
-FROM base AS deps
-
-RUN apk add --no-cache libc6-compat
+# BUILD FOR LOCAL DEVELOPMENT
+FROM base AS development
 WORKDIR /app
+COPY --chown=node:node package*.json ./
+RUN npm ci;
+COPY --chown=node:node . .
+USER node
 
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
 
-# Rebuild the source code only when needed
-FROM base AS builder
+# BUILD FOR PRODUCTION
+FROM base AS build
 WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node --from=development /app/node_modules ./node_modules
+COPY --chown=node:node . .
+RUN npm run build;
 ENV NODE_ENV production
+RUN npm i -g husky && npm ci --only=production && npm cache clean --force
+USER node
 
-RUN yarn build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nestjs
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/dist ./
-
-USER nestjs
-
-CMD ["node", "dist/main"]
+# PRODUCTION
+FROM base As production
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/dist ./dist
+CMD [ "node", "dist/src/main" ]
